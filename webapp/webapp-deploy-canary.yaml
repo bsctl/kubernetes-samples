@@ -1,0 +1,157 @@
+apiVersion: extensions/v1beta1
+kind: Ingress
+metadata:
+  name: webapp
+  annotations:
+    kubernetes.io/ingress.class: "traefik"
+    traefik.ingress.kubernetes.io/service-weights: |
+      webapp-stable: 80%
+      webapp-canary: 20%
+spec:
+  rules:
+  - host: webapp.kube.noverit.com
+    http:
+      paths:
+      - path: /
+        backend:
+          serviceName: webapp-stable
+          servicePort: 80
+      - path: /
+        backend:
+          serviceName: webapp-canary
+          servicePort: 80
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: webapp-stable
+  labels:
+    run: webapp-stable
+  namespace:
+spec:
+  ports:
+  - protocol: TCP
+    port: 80
+    targetPort: 8080
+  selector:
+    run: webapp-stable
+    version: v1.0.0
+  type: ClusterIP
+  sessionAffinity: None
+---
+apiVersion: apps/v1
+kind: ReplicaSet
+metadata:
+  labels:
+  namespace:
+  name: webapp-stable
+spec:
+  replicas: 6
+  selector:
+    matchLabels:
+      run: webapp-stable
+      version: v1.0.0
+  template:
+    metadata:
+      labels:
+        run: webapp-stable
+        version: v1.0.0
+    spec:
+      containers:
+      - image: bsctl/deploy-webapp:latest
+        name: webapp
+        env:
+        - name: VERSION
+          value: v1.0.0
+        ports:
+        - name: root
+          containerPort: 8080
+          protocol: TCP
+        - name: probe
+          containerPort: 8086
+          protocol: TCP
+        - name: metrics
+          containerPort: 9101
+          protocol: TCP
+        readinessProbe:
+          httpGet:
+            path: /ready
+            port: 8086
+            scheme: HTTP
+          initialDelaySeconds: 20
+          periodSeconds: 10
+        livenessProbe:
+          httpGet:
+            path: /live
+            port: 8086
+            scheme: HTTP
+          periodSeconds: 15
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: webapp-canary
+  labels:
+    run: webapp-canary
+  namespace:
+spec:
+  ports:
+  - protocol: TCP
+    port: 80
+    targetPort: 8080
+  selector:
+    run: webapp-canary
+    version: v2.0.0
+  type: ClusterIP
+  sessionAffinity: None
+---
+apiVersion: apps/v1
+kind: ReplicaSet
+metadata:
+  labels:
+  namespace:
+  name: webapp-canary
+spec:
+  replicas: 6
+  selector:
+    matchLabels:
+      run: webapp-canary
+      version: v2.0.0
+  template:
+    metadata:
+      labels:
+        run: webapp-canary
+        version: v2.0.0
+      annotations:
+        prometheus.io/scrape: "true"
+        prometheus.io/port: "9090"
+    spec:
+      containers:
+      - image: bsctl/go-web-app:latest
+        name: webapp
+        env:
+        - name: VERSION
+          value: v2.0.0
+        ports:
+        - name: root
+          containerPort: 8080
+          protocol: TCP
+        - name: probe
+          containerPort: 8090
+          protocol: TCP
+        - name: metrics
+          containerPort: 9090
+          protocol: TCP
+        readinessProbe:
+          httpGet:
+            path: /ready
+            port: 8090
+            scheme: HTTP
+          initialDelaySeconds: 30
+          periodSeconds: 20
+        livenessProbe:
+          httpGet:
+            path: /live
+            port: 8090
+            scheme: HTTP
+          periodSeconds: 15

@@ -1,0 +1,26 @@
+apiVersion: v1
+kind: Pod
+metadata:
+  name: mysql
+  namespace:
+  labels:
+    run: mysql
+spec:
+  containers:
+  - name: mysql
+    image: mysql:5.6
+    env:
+    - name: MYSQL_RANDOM_ROOT_PASSWORD
+      # The generated root password will be printed to stdout
+      # kubectl logs mysql | grep GENERATED
+      value: "yes"
+    - name: MYSQL_DATABASE
+      value: "employee"
+    - name: MYSQL_USER
+      value: "admin"
+    - name: MYSQL_PASSWORD
+      value: "password"
+    ports:
+    - name: mysql
+      protocol: TCP
+      containerPort: 3306

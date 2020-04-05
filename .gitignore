@@ -1,0 +1,13 @@
+# .DS_Store
+*.DS_Store
+
+# .tls
+*.crt
+*.key
+*.pem
+*.cnf
+
+# .tfstate
+*.tfstate
+*.tfstate.*
+

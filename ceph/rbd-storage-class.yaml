@@ -1,0 +1,17 @@
+apiVersion: storage.k8s.io/v1
+kind: StorageClass
+metadata:
+  name: rbd
+  annotations:
+    storageclass.kubernetes.io/is-default-class: "false"
+provisioner: ceph.com/rbd
+reclaimPolicy: Delete
+parameters:
+  monitors: ceph00:6789,ceph01:6789.ceph02:6789
+  adminId: admin
+  adminSecretName: rbd-secret-admin
+  adminSecretNamespace: kube-system
+  pool: kube
+  userId: kube
+  userSecretName: rbd-secret-kube
+  imageFormat: "1"

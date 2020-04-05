@@ -1,0 +1,31 @@
+apiVersion: v1
+kind: Pod
+metadata:
+  name: nginx
+  namespace:
+  labels:
+    run: nginx
+spec:
+  hostNetwork: true
+  hostPID: true
+  hostIPC: true
+  containers:
+  - name: container-1
+    image: nginx:latest
+    ports:
+    - containerPort: 80
+    volumeMounts:
+    - name: content-data
+      mountPath: /usr/share/nginx/html
+      readOnly: false
+    resources:
+      requests:
+        cpu: 100m
+        memory: 512Mi
+      limits:
+        cpu: 100m
+        memory: 512Mi
+  volumes:
+    - name: content-data
+      hostPath:
+        path: /mnt

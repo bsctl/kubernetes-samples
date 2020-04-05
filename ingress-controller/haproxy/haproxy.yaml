@@ -1,0 +1,104 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  labels:
+    run: ingress-default-backend
+  name: ingress-default-backend
+  namespace: kube-system
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      run: ingress-default-backend
+  template:
+    metadata:
+      labels:
+        run: ingress-default-backend
+    spec:
+      # use toleration if a taint is set on the worker nodes
+      #tolerations:
+      #- key: node-role.kubernetes.io/infra
+      #  effect: NoSchedule
+      #nodeSelector:
+      #  node-role.kubernetes.io/infra: ""
+      containers:
+      - name: ingress-default-backend
+        image: gcr.io/google_containers/defaultbackend:1.0
+        ports:
+        - containerPort: 8080
+        resources:
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+  labels:
+    run: ingress-default-backend
+  name: ingress-default-backend
+  namespace: kube-system
+spec:
+  selector:
+    run: ingress-default-backend
+  ports:
+  - name: port-1
+    port: 8080
+    protocol: TCP
+    targetPort: 8080
+
+---
+apiVersion: extensions/v1beta1
+kind: DaemonSet
+metadata:
+  name: haproxy-ingress
+  namespace: kube-system
+  labels:
+    run: haproxy-ingress
+spec:
+  selector:
+    matchLabels:
+      run: haproxy-ingress
+  template:
+    metadata:
+      labels:
+        run: haproxy-ingress
+    spec:
+      serviceAccountName: haproxy-ingress-service-account
+      hostNetwork: true
+      priorityClassName: system-node-critical
+      # use toleration if a taint is set on the worker nodes
+      # tolerations:
+      # - key: node-role.kubernetes.io/infra
+      #   effect: NoSchedule
+      # nodeSelector:
+      #   node-role.kubernetes.io/infra: ""
+      containers:
+      - name: haproxy-ingress
+        image: haproxytech/kubernetes-ingress:latest
+        args:
+          - --configmap=kube-system/haproxy-configmap
+          - --default-backend-service=kube-system/ingress-default-backend
+          - --default-ssl-certificate=kube-system/noverit-tls
+        resources:
+          requests:
+            cpu: "100m"
+            memory: "50Mi"
+        livenessProbe:
+          httpGet:
+            path: /healthz
+            port: 1042
+        ports:
+        - name: http
+          containerPort: 80
+        - name: https
+          containerPort: 443
+        - name: stat
+          containerPort: 1024
+        env:
+        - name: POD_NAME
+          valueFrom:
+            fieldRef:
+              fieldPath: metadata.name
+        - name: POD_NAMESPACE
+          valueFrom:
+            fieldRef:
+              fieldPath: metadata.namespace

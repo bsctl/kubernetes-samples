@@ -1,0 +1,83 @@
+---
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: origin
+  namespace: kube-system
+---
+apiVersion: rbac.authorization.k8s.io/v1beta1
+kind: ClusterRoleBinding
+metadata:
+  name: origin
+subjects:
+- kind: ServiceAccount
+  name: origin
+  namespace: kube-system
+roleRef:
+  kind: ClusterRole
+  name: cluster-admin
+  apiGroup: rbac.authorization.k8s.io
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  labels:
+    run: origin
+  name: origin
+  namespace: kube-system
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      run: origin
+  template:
+    metadata:
+      labels:
+        run: origin
+    spec:
+      serviceAccountName: origin
+      containers:
+      - image: quay.io/openshift/origin-console:latest
+        imagePullPolicy: Always
+        name: console
+        env:
+        - name: BRIDGE_USER_AUTH
+          value: disabled # must be one of: oidc, disabled
+        ports:
+        - containerPort: 9000
+          protocol: TCP
+      restartPolicy: Always
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: origin
+  namespace: kube-system
+  labels:
+    run: origin
+spec:
+  ports:
+  - protocol: TCP
+    port: 80
+    targetPort: 9000
+  selector:
+    run: origin
+---
+apiVersion: extensions/v1beta1
+kind: Ingress
+metadata:
+  namespace: kube-system
+  name: origin
+  labels:
+    run: origin
+  annotations:
+    kubernetes.io/ingress.class: traefik
+spec:
+  rules:
+  - host: origin.kube.noverit.com
+    http:
+      paths:
+      - path: /
+        backend:
+          serviceName: origin
+          servicePort: 80

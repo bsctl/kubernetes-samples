@@ -1,0 +1,34 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: traefik
+  namespace: kube-system
+  annotations:
+    prometheus.io/scrape: "true"
+spec:
+  selector:
+    app: traefik
+  ports:
+    - protocol: TCP
+      port: 9090
+      name: metrics
+    - protocol: TCP
+      port: 8080
+      name: dashboard
+---
+apiVersion: extensions/v1beta1
+kind: Ingress
+metadata:
+  name: traefik-dashboard
+  namespace: kube-system
+  annotations:
+    kubernetes.io/ingress.class: "traefik"
+spec:
+  rules:
+  - host: traefik.noverit.com
+    http:
+      paths:
+      - path: /
+        backend:
+          serviceName: traefik
+          servicePort: 8080

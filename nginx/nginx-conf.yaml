@@ -1,0 +1,15 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: nginx
+  namespace:
+data:
+  nginx.conf: |
+    server {
+        listen       80;
+        server_name  google.com;
+        location / {
+            root   /usr/share/nginx/html;
+            index  index.html index.htm;
+        }
+    }

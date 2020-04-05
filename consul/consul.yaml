@@ -1,0 +1,75 @@
+---
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: consul
+  labels:
+    app: consul
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: consul
+spec:
+  ports:
+  - port: 8500
+    name: http
+  selector:
+    app: consul
+---
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: consul
+  namespace:
+  labels:
+spec:
+  serviceName: consul
+  replicas: 3
+  selector:
+    matchLabels:
+      app: consul
+  template:
+    metadata:
+      labels:
+        app: consul
+    spec:
+      serviceAccountName: consul
+      terminationGracePeriodSeconds: 10
+      containers:
+        - name: node
+          image: consul:latest
+          env:
+            - name: POD_NAMESPACE
+              valueFrom:
+                fieldRef:
+                  fieldPath: metadata.namespace
+          volumeMounts:
+            - name: data
+              mountPath: /consul/data
+          args:
+          - consul
+          - agent
+          - -datacenter=kubernetes
+          - -log-level=debug
+          - -bootstrap-expect=3
+          - -retry-join=provider="k8s" namespace="$(POD_NAMESPACE)" label_selector="app=consul"
+          - -client=0.0.0.0
+          - -bind=0.0.0.0
+          - -data-dir=/consul/data
+          - -server
+          - -domain=cluster.local
+          - -ui
+          lifecycle:
+            preStop:
+              exec:
+                command: ["/bin/sh", "-c", "consul leave"]
+  volumeClaimTemplates:
+    - metadata:
+        name: data
+      spec:
+        accessModes:
+          - ReadWriteOnce
+        resources:
+          requests:
+            storage: 1Gi

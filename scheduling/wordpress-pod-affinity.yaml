@@ -1,0 +1,38 @@
+apiVersion: extensions/v1beta1
+kind: Deployment
+metadata:
+  name: wordpress
+  namespace:
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      run: blog
+  template:
+    metadata:
+      labels:
+        run: blog
+    spec:
+      affinity:
+        podAffinity:
+          requiredDuringSchedulingIgnoredDuringExecution:
+            - labelSelector:
+                matchExpressions:
+                - key: run
+                  operator: In
+                  values:
+                  - "mariadb"
+              topologyKey: kubernetes.io/hostname
+      containers:
+      - image: bitnami/wordpress:latest
+        name: wordpress
+        ports:
+        - containerPort: 80
+          protocol: TCP
+        - containerPort: 443
+          protocol: TCP
+        env:
+        - name: MARIADB_HOST
+          value: mariadb
+        - name: MARIADB_PORT
+          value: '3306'

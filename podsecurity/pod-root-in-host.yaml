@@ -1,0 +1,18 @@
+apiVersion: v1
+kind: Pod
+metadata:
+  name: pod-root-in-host
+  namespace:
+  labels:
+spec:
+  restartPolicy: Never
+  hostPID: true
+  containers:
+  - name: alpine
+    image: alpine:3.7
+    # start a bash as root by entering into the system mount namespace
+    command: ["nsenter", "--mount=/proc/1/ns/mnt", "--", "/bin/bash"]
+    securityContext:
+      privileged: true
+    stdin: true
+    tty: true

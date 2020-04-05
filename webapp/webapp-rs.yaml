@@ -1,0 +1,41 @@
+apiVersion: apps/v1
+kind: ReplicaSet
+metadata:
+  labels:
+  namespace:
+  name: webapp
+spec:
+  replicas: 3
+  selector:
+    matchLabels:
+      run: webapp
+  template:
+    metadata:
+      labels:
+        run: webapp
+    spec:
+      containers:
+      - image: bsctl/go-web-app:latest
+        name: webapp
+        ports:
+        - name: root
+          containerPort: 8080
+          protocol: TCP
+        - name: probe
+          containerPort: 8090
+          protocol: TCP
+        - name: metrics
+          containerPort: 9090
+          protocol: TCP
+        readinessProbe:
+          httpGet:
+            path: /ready
+            port: 8090
+            scheme: HTTP
+          periodSeconds: 20
+        livenessProbe:
+          httpGet:
+            path: /live
+            port: 8090
+            scheme: HTTP
+          periodSeconds: 15

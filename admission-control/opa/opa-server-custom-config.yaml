@@ -1,0 +1,20 @@
+# by default, the kube-mgmt sidecar will load policies from configmaps
+# labelled as openpolicyagent.org/policy=rego
+---
+kind: ConfigMap
+apiVersion: v1
+metadata:
+  name: opa-custom-policy
+  namespace: webhooks
+  labels:
+    openpolicyagent.org/policy: rego
+data:
+  custom: |
+    package kubernetes.admission
+    deny[msg] {
+      input.request.kind.kind == "Pod"
+      i := 0
+      image := input.request.object.spec.containers[i].image
+      not startswith(image, "quay.io")
+      msg := sprintf("Image does not come from quay.io registry: %v", [image])
+    }

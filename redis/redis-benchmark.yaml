@@ -1,0 +1,13 @@
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: redis-bench
+spec:
+  template:
+    metadata:
+      name: bench
+    spec:
+      containers:
+      - name: bench
+        image: clue/redis-benchmark
+      restartPolicy: Never

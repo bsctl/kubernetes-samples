@@ -1,0 +1,93 @@
+apiVersion: image.openshift.io/v1
+kind: ImageStream
+metadata:
+  labels:
+    app: nodejs
+  name: nodejs
+  namespace:
+spec:
+  lookupPolicy:
+    local: false
+---
+apiVersion: build.openshift.io/v1
+kind: BuildConfig
+metadata:
+  labels:
+    app: nodejs
+  name: nodejs
+  namespace:
+spec:
+  successfulBuildsHistoryLimit: 5
+  failedBuildsHistoryLimit: 5
+  triggers:
+  - imageChange:
+    type: ImageChange
+  - type: ConfigChange
+  source:
+    git:
+      ref: master
+      uri: https://github.com/sclorg/nodejs-ex.git
+    type: Git
+  output:
+    to:
+      # push to the local registry
+      kind: ImageStreamTag
+      name: nodejs:latest
+  runPolicy: Serial
+  strategy:
+    sourceStrategy:
+      from:
+        kind: ImageStreamTag
+        name: nodejs:10
+        namespace: openshift
+    type: Source
+---
+apiVersion: apps.openshift.io/v1
+kind: DeploymentConfig
+metadata:
+  labels:
+    app: nodejs
+  name: nodejs
+  namespace:
+spec:
+  replicas: 3
+  revisionHistoryLimit: 10
+  selector:
+    app: nodejs
+    deploymentconfig: nodejs
+  strategy:
+    rollingParams:
+      intervalSeconds: 1
+      maxSurge: 1
+      maxUnavailable: 0
+    type: Rolling
+  template:
+    metadata:
+      creationTimestamp: null
+      labels:
+        app: nodejs
+        deploymentconfig: nodejs
+    spec:
+      containers:
+      - image: image-registry.openshift-image-registry.svc:5000/demo/nodejs:latest
+        imagePullPolicy: Always
+        name: nodejs
+        ports:
+        - containerPort: 8080
+          protocol: TCP
+  test: false
+  triggers:
+  - type: ConfigChange
+  - type: ImageChange
+    imageChangeParams:
+      automatic: true
+      containerNames:
+      - nodejs
+      from:
+        kind: ImageStreamTag
+        name: nodejs:latest
+        namespace: 
+---
+# To access the registry
+# oc get svc -n openshift-image-registry
+# docker login -u demo -p $(oc whoami -t) registry.apps.noverit.osc.link:443

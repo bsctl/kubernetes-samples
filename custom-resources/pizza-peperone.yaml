@@ -1,0 +1,12 @@
+apiVersion: restaurant.programming-kubernetes.info/v1beta1
+kind: Pizza
+metadata:
+  name: peperone
+spec:
+  toppings:
+  - name: mozzarella
+    quantity: 3
+  - name: tomato
+    quantity: 2
+  - name: peperone
+    quantity: 6

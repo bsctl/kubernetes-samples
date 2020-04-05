@@ -1,0 +1,23 @@
+# Make sure nodes with "infra" role have been tainted before
+# kubectl taint node kubei01 node-role=infra:NoSchedule
+# this pod can be assigned to tainted node
+# however this is not preventing the pod to be assigned to other nodes too
+
+---
+apiVersion: v1
+kind: Pod
+metadata:
+  name: nginx
+  namespace:
+  labels:
+spec:
+  tolerations:
+  - key: node-role
+    operator: Equal
+    value: "infra"
+    effect: NoSchedule
+  containers:
+  - name: nginx
+    image: nginx:latest
+    ports:
+    - containerPort: 80

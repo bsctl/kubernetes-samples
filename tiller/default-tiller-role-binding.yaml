@@ -1,0 +1,15 @@
+# For every namespace we want Tiller be able to deploy, create a Role Binding with the above permissions
+---
+kind: RoleBinding
+apiVersion: rbac.authorization.k8s.io/v1
+metadata:
+  name: tiller
+  namespace: default
+subjects:
+- kind: ServiceAccount
+  name: tiller
+  namespace: tiller
+roleRef:
+  kind: ClusterRole
+  name: tiller
+  apiGroup: rbac.authorization.k8s.io

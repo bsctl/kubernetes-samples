@@ -1,0 +1,14 @@
+# Client service for connecting to MySQL master for writes
+# Make sure to label the master pod with the proper label
+# kubectl label pod mysql-0 run=mysql-wr
+apiVersion: v1
+kind: Service
+metadata:
+  name: mysql-wr
+spec:
+  ports:
+  - name: mysql
+    port: 3306
+    targetPort: 3306
+  selector:
+    run: mysql-wr

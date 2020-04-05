@@ -1,0 +1,15 @@
+# Headless service if you only need for endpoints.
+apiVersion: v1
+kind: Service
+metadata:
+  name: webapp
+  labels:
+    run: webapp
+spec:
+  ports:
+  - protocol: TCP
+    port: 80
+    targetPort: 8080
+  clusterIP: None
+  selector:
+    run: webapp

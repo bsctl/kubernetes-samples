@@ -1,0 +1,56 @@
+# kubectl set image deploy nodejs nodejs=bsctl/nodejs-web-app:1.1
+# kubectl rollout status deploy nodejs
+# kubectl rollout pause deploy nodejs
+# kubectl rollout resume deploy nodejs
+# kubectl rollout undo deploy nodejs [--to-revision=3]
+
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  labels:
+  name: nodejs
+  namespace:
+spec:
+  minReadySeconds: 10
+  progressDeadlineSeconds: 300
+  revisionHistoryLimit: 3
+  replicas: 3
+  selector:
+    matchLabels:
+      app: nodejs
+  strategy:
+    rollingUpdate:
+      maxSurge: 1
+      maxUnavailable: 0
+    type: RollingUpdate
+  template:
+    metadata:
+      labels:
+        app: nodejs
+    spec:
+      containers:
+      - image: bsctl/nodejs-web-app:1.0
+        name: nodejs
+        ports:
+        - containerPort: 8080
+          protocol: TCP
+        livenessProbe:
+          httpGet:
+            path: /
+            port: 8080
+            scheme: HTTP
+        readinessProbe:
+          httpGet:
+            path: /
+            port: 8080
+            scheme: HTTP
+        env:
+          - name: MESSAGE
+            value: "Hello Gdansk"
+        resources:
+          requests:
+            cpu: 100m
+            memory: 512Mi
+          limits:
+            cpu: 100m
+            memory: 512Mi

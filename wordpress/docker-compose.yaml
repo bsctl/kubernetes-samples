@@ -1,0 +1,41 @@
+version: '3.3'
+services:
+   mariadb:
+     image: bitnami/mariadb:latest
+     networks:
+       - backend
+     volumes:
+       - data:/bitnami/mariadb
+     restart: always
+     environment:
+       MARIADB_ROOT_PASSWORD: bitnami123
+       MARIADB_DATABASE: wordpress
+       MARIADB_USER: bitnami
+       MARIADB_PASSWORD: bitnami123
+   wordpress:
+     depends_on:
+       - mariadb
+     image: bitnami/wordpress:latest
+     networks:
+       - frontend
+       - backend
+     ports:
+       - "80:80"
+       - "443:443"
+     restart: always
+     environment:
+       MARIADB_HOST: mariadb
+       MARIADB_PORT_NUMBER: 3306
+       WORDPRESS_DATABASE_NAME: wordpress
+       WORDPRESS_DATABASE_USER: bitnami
+       WORDPRESS_DATABASE_PASSWORD: bitnami123
+       WORDPRESS_USERNAME: admin
+       WORDPRESS_PASSWORD: password
+       WORDPRESS_BLOG_NAME: Adriano's Blog
+volumes:
+    data: {}
+networks:
+  frontend:
+    driver: bridge
+  backend:
+    driver: bridge

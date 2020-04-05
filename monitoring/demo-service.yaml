@@ -1,0 +1,40 @@
+---
+apiVersion: extensions/v1beta1
+kind: Deployment
+metadata:
+  name: demo-service
+  namespace:
+  labels:
+spec:
+  replicas: 3
+  template:
+    metadata:
+      labels:
+        name: demo-service
+    spec:
+      containers:
+      - name: demo-service
+        image: julius/prometheus-demo-service:latest
+        imagePullPolicy: IfNotPresent
+        args:
+        - -listen-address=:80
+        ports:
+        - containerPort: 80
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: demo-service
+  namespace:
+  annotations:
+    prometheus.io/scrape: "true"
+spec:
+  ports:
+  - port: 80
+    name: demo-service
+  selector:
+    name: demo-service
+---
+# Example metrics:
+# sum by(job) (rate(demo_api_request_duration_seconds_count[1m]))
+# demo_api_request_duration_seconds_count{method="GET",status="200"}

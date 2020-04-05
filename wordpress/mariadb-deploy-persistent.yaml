@@ -1,0 +1,49 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  generation: 1
+  labels:
+    run: mariadb
+  name: mariadb
+  namespace:
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      run: mariadb
+  strategy:
+    rollingUpdate:
+      maxSurge: 1
+      maxUnavailable: 1
+    type: RollingUpdate
+  template:
+    metadata:
+      labels:
+        run: mariadb
+    spec:
+      securityContext:
+        fsGroup: 0
+        # fsGroup: 2000
+      containers:
+      - image: bitnami/mariadb:latest
+        imagePullPolicy: Always
+        name: mariadb
+        ports:
+        - containerPort: 3306
+          protocol: TCP
+        env:
+        - name: MARIADB_ROOT_PASSWORD
+          value: bitnami123
+        - name: MARIADB_DATABASE
+          value: wordpress
+        - name: MARIADB_USER
+          value: bitnami
+        - name: MARIADB_PASSWORD
+          value: bitnami123
+        volumeMounts:
+        - name: data
+          mountPath: /bitnami/mariadb
+      volumes:
+      - name: data
+        persistentVolumeClaim:
+          claimName: mariadb-pvc

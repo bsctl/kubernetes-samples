@@ -1,0 +1,22 @@
+# Once the sidecar is running,
+# visit http://<pod_ip_addr>:1080/topz to get a complete readout of the processes that
+# are running in the nginx and their resource usage
+# credits: https://github.com/brendandburns/topz
+apiVersion: v1
+kind: Pod
+metadata:
+  name: nginx
+  namespace:
+  labels:
+    run: nginx
+spec:
+  shareProcessNamespace: true
+  containers:
+  - name: main
+    image: nginx:latest
+    ports:
+    - containerPort: 80
+  - name: topz
+    image: bsctl/topz:latest
+    ports:
+      - containerPort: 1080

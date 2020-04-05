@@ -1,0 +1,29 @@
+# First, enable the iSCSI target and configure it:
+# Portal, IQN, LUN, and Access List
+# On each worker node, install the iSCSI initiator and configure it:
+# IQN and CHAP credentials
+---
+apiVersion: v1
+kind: PersistentVolume
+metadata:
+  name: block00
+  labels:
+    name: block00
+spec:
+  capacity:
+    storage: 3Gi
+  storageClassName: manual
+  accessModes:
+  - ReadWriteOnce
+  persistentVolumeReclaimPolicy: Retain
+  iscsi:
+    targetPortal: 10.10.10.2:3260 # use the IP address unless pods are able to resolve external names
+    iqn: iqn.2017-10.com.noverit.centos:3260
+    lun: 0
+    fsType: "ext4"
+    readOnly: false
+    chapAuthDiscovery: true
+    chapAuthSession: true
+    # remember to create the secret to pass CHAP credentials
+    secretRef:
+      name: iscsi-chap-secret

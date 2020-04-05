@@ -1,0 +1,22 @@
+apiVersion: v1
+kind: Pod
+metadata:
+  name: nginx-node-affinity
+  namespace:
+  labels:
+    app: nginx
+spec:
+  affinity:
+    nodeAffinity:
+      requiredDuringSchedulingIgnoredDuringExecution:
+        nodeSelectorTerms:
+        - matchExpressions:
+          - key: datacenter
+            operator: In
+            values:
+            - milano
+  containers:
+  - name: nginx
+    image: nginx:latest
+    ports:
+    - containerPort: 80

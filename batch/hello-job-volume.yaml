@@ -1,0 +1,31 @@
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: myjob
+spec:
+  completions: 16
+  parallelism: 4
+  template:
+    metadata:
+      name: hello
+    spec:
+      containers:
+      - name: hello
+        image: busybox
+        imagePullPolicy: IfNotPresent
+        env:
+        - name: POD_NAME
+          valueFrom:
+            fieldRef:
+              fieldPath: metadata.name
+        volumeMounts:
+        - name: data
+          mountPath: /tmp
+        args:
+        - /bin/sh
+        - -c
+        - echo Hello from $(POD_NAME) > /tmp/output
+      restartPolicy: OnFailure
+      volumes:
+      - name: data
+        emptyDir: {}

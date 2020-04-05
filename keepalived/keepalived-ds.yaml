@@ -1,0 +1,37 @@
+kind: DaemonSet
+apiVersion: extensions/v1beta1
+metadata:
+  name: keepalived
+  namespace: kube-system
+  labels:
+    run: keepalived
+spec:
+  selector:
+    matchLabels:
+      app: keepalived
+  template:
+    metadata:
+      labels:
+        app: keepalived
+    spec:
+      tolerations:
+      - key: node-role.kubernetes.io/master
+        effect: NoSchedule 
+      hostNetwork: true
+      containers:
+      - image: bsctl/keepalived:1.0
+        name: keepalived
+        volumeMounts:
+        - name: config
+          mountPath: /etc/keepalived
+        resources:
+          requests:
+            cpu: 100m
+        securityContext:
+          capabilities:
+            add:
+            - NET_ADMIN
+      volumes:
+      - name: config
+        hostPath:
+          path: /etc/keepalived

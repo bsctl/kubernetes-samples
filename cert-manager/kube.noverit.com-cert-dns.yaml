@@ -1,0 +1,23 @@
+apiVersion: certmanager.k8s.io/v1alpha1
+kind: Certificate
+metadata:
+  name: kube.noverit.com
+  namespace: 
+spec:
+  secretName: noverit-tls
+  issuerRef:
+    kind: ClusterIssuer
+    #name: letsencrypt-staging
+    name: letsencrypt-prod
+  commonName: '*.noverit.com'
+  dnsNames:
+  - noverit.com
+  acme:
+    config:
+    - dns01:
+        provider: prod-dns
+        ingressClass: traefik
+      domains:
+      - noverit.com
+      - kube.noverit.com
+      - '*.noverit.com'

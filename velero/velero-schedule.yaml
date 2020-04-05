@@ -1,0 +1,20 @@
+apiVersion: velero.io/v1
+kind: Schedule
+metadata:
+  name: backup
+  namespace: velero
+spec:
+  schedule: '@every 1h'
+  template:
+    excludedNamespaces: null
+    excludedResources: null
+    hooks:
+      resources: null
+    includeClusterResources: null
+    includedNamespaces:
+    - '*'
+    includedResources: null
+    labelSelector: null
+    storageLocation: ""
+    ttl: 720h0m0s
+    volumeSnapshotLocations: null

@@ -1,0 +1,10 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: mysql
+  namespace:
+data:
+  MYSQL_RANDOM_ROOT_PASSWORD: "yes"
+  MYSQL_DATABASE: "employees"
+  MYSQL_USER: "admin"
+  MYSQL_PASSWORD: "password"

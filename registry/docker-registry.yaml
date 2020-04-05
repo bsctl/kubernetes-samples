@@ -1,0 +1,95 @@
+# README
+
+# Create the PKI environment for registry
+# openssl genrsa -des3 -out ca.key 4096
+# openssl req -x509 -new -nodes -key ca.key -sha256 -days 1024 -out ca.crt
+# openssl genrsa -out registry.key 2048
+# openssl req -new -key registry.key -out registry.csr
+# openssl x509 -req -in registry.csr -CA ca.crt -CAkey ca.key -CAcreateserial -out registry.crt -days 365 -sha256
+# kubectl -n registry create secret generic registry --from-file=registry.cert --from-file=registry.key
+# 
+# Create a dedicated namespace for registry
+# kubectl create namespace registry
+#
+# Create the secret in the namespace
+# kubectl -n registry create secret generic registry --from-file=registry.crt --from-file=registry.key
+#
+# Create the registry (from this file)
+# kubectl apply -f docker-registry.yaml
+#
+# On the client side, make sure you trust the CA
+# mkdir -p /etc/docker/certs.d/registry.noverit.com:30000
+# mv ca.crt /etc/docker/certs.d/registry.noverit.com:30000
+# systemctl restart docker
+---
+kind: PersistentVolumeClaim
+apiVersion: v1
+metadata:
+  name: registry
+  labels:
+    app: registry
+  namespace: registry
+spec:
+  #storageClassName: standard
+  accessModes:
+    - ReadWriteOnce
+  resources:
+    requests:
+      storage: 10Gi
+---
+apiVersion: extensions/v1beta1
+kind: Deployment
+metadata:
+  labels:
+    app: registry
+  name: registry
+  namespace: registry
+spec:
+  replicas: 1
+  strategy:
+    type: RollingUpdate
+  template:
+    metadata:
+      labels:
+        app: registry
+    spec:
+      containers:
+      - image: registry:2
+        name: registry
+        ports:
+        - containerPort: 5000
+        env:
+        - name: REGISTRY_HTTP_TLS_CERTIFICATE
+          value: /certs/registry.crt
+        - name: REGISTRY_HTTP_TLS_KEY
+          value: /certs/registry.key
+        volumeMounts:
+          - name: data
+            mountPath: /var/lib/registry
+          - name: auth
+            mountPath: /certs
+      volumes:
+        - name: data
+          persistentVolumeClaim:
+            claimName: registry
+        - name: auth
+          secret:
+            secretName: registry
+            optional: true
+---
+apiVersion: v1
+kind: Service
+metadata:
+  labels:
+    app: registry
+  name: registry
+  namespace: registry
+spec:
+  ports:
+  - name: https
+    port: 5000
+    targetPort: 5000
+    nodePort: 30000
+  selector:
+    app: registry
+  type: NodePort

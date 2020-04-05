@@ -1,0 +1,130 @@
+kind: ConfigMap
+apiVersion: v1
+metadata:
+  name: prometheus-config
+  namespace: monitoring
+  labels:
+data:
+  prometheus-config.yaml: |
+    global:
+      scrape_interval: 5s
+
+    scrape_configs:
+    # Scrape the Kubernetes API server.
+    # This scrapes all endpoints of services in the default namespace as for
+    # kubectl get ep -n default
+    # NAME         ENDPOINTS           AGE
+    # kubernetes   192.168.1.12:6443   5d13h
+    # This monitors the health of the Kubernetes API Server instances
+    - job_name: 'kubernetes-apiserver'
+      kubernetes_sd_configs:
+      - role: endpoints
+        namespaces:
+          names: [default]
+      scheme: https
+      tls_config:
+        # Required for scraping the API server.
+        ca_file: /var/run/secrets/kubernetes.io/serviceaccount/ca.crt
+        # Required for self-signed certificates.
+        insecure_skip_verify: true
+      # Required for performing service discovery.
+      bearer_token_file: /var/run/secrets/kubernetes.io/serviceaccount/token
+      # Only keeps the Kubernetes API server via relabeling.
+      relabel_configs:
+      - source_labels: [__meta_kubernetes_service_name]
+        action: keep
+        regex: kubernetes
+
+    # Scrape the Kubelets. This monitors the health of the Kubelets themselves.
+    - job_name: kubelet
+      metrics_path: /metrics
+      scheme: http
+      kubernetes_sd_configs:
+      - role: node
+      relabel_configs:
+      - separator: ;
+        regex: __meta_kubernetes_node_label_(.+)
+        replacement: $1
+        action: labelmap
+      - source_labels: [__address__]
+        separator: ;
+        regex: ([^:]+)(?::\d+)?
+        target_label: __address__
+        replacement: $1:10255
+        action: replace
+    
+    # Scrape the Kubelet's built-in cAdvisor.
+    # This monitors the built-in cAdvisor endpoint of the Kubelets, which
+    # exposes per-container resource usage metrics for the containers running on each machine
+    - job_name: cadvisor
+      metrics_path: /metrics
+      scheme: http
+      kubernetes_sd_configs:
+      - role: node
+      relabel_configs:
+      - separator: ;
+        regex: __meta_kubernetes_node_label_(.+)
+        replacement: $1
+        action: labelmap
+      - source_labels: [__address__]
+        separator: ;
+        regex: ([^:]+)(?::\d+)?
+        target_label: __address__
+        replacement: $1:10255
+        action: replace
+      - separator: ;
+        regex: (.*)
+        target_label: __metrics_path__
+        replacement: /metrics/cadvisor
+        action: replace
+      metric_relabel_configs:
+      - source_labels: [namespace]
+        separator: ;
+        regex: ^$
+        replacement: $1
+        action: drop
+      - source_labels: [pod_name]
+        separator: ;
+        regex: ^$
+        replacement: $1
+        action: drop
+    
+    # Scrape service endpoints.
+    # The relabeling allows the actual service scrape endpoint to be configured
+    # via the following annotations:
+    # * `prometheus.io/scrape`: Only scrape services that have a value of `true`
+    # * `prometheus.io/scheme`: If the metrics endpoint is secured then you will need to set this to `https` & most likely set the `tls_config` of the scrape config.
+    # * `prometheus.io/path`: If the metrics path is not `/metrics` override this.
+    # * `prometheus.io/port`: If the metrics are exposed on a different port to the service then set this appropriately.
+    - job_name: 'kubernetes-service-endpoints'
+      kubernetes_sd_configs:
+      - role: endpoints
+      relabel_configs:
+      - action: keep
+        source_labels: [__meta_kubernetes_service_annotation_prometheus_io_scrape]
+        regex: true
+      - action: replace
+        source_labels: [__meta_kubernetes_service_annotation_prometheus_io_scheme]
+        regex: (https?)
+        target_label: __scheme__
+      - action: replace
+        source_labels: [__meta_kubernetes_service_annotation_prometheus_io_path]
+        regex: (.+)
+        target_label: __metrics_path__
+      - action: replace
+        source_labels: [__address__, __meta_kubernetes_service_annotation_prometheus_io_port]
+        regex: ([^:]+)(?::\d+)?;(\d+)
+        replacement: $1:$2
+        target_label: __address__
+      - action: labelmap
+        regex: __meta_kubernetes_service_label_(.+)
+      - action: replace
+        source_labels: [__meta_kubernetes_endpoint_port_name]
+        target_label: port
+      - action: replace
+        source_labels: [__meta_kubernetes_namespace]
+        target_label: namespace
+      - action: replace
+        source_labels: [__meta_kubernetes_service_name]
+        target_label: job
+

@@ -1,0 +1,21 @@
+apiVersion: v1
+kind: Pod
+metadata:
+  name: nginx
+  namespace:
+  labels:
+spec:
+  containers:
+  - name: nginx
+    image: nginx:latest
+    ports:
+    - containerPort: 80
+    volumeMounts:
+    - name: content-data
+      mountPath: /usr/share/nginx/html
+  volumes:
+  - name: content-data
+    nfs:
+      server: "nfs-server"
+      path: "/nfs-share"
+      readOnly: false

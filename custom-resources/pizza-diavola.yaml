@@ -1,0 +1,19 @@
+apiVersion: restaurant.programming-kubernetes.info/v1beta1
+kind: Pizza
+metadata:
+  name: diavola
+  namespace:
+  labels:
+    tast: good
+spec:
+  toppings:
+  - name: mozzarella
+    quantity: 3
+  - name: tomato
+    quantity: 2
+  - name: peperone
+    quantity: 1
+  - name: salame
+    quantity: 3
+  - name: basil
+    quantity: 1

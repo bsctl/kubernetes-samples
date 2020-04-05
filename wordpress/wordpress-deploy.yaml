@@ -1,0 +1,65 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  generation: 1
+  labels:
+    run: blog
+  name: wordpress
+  namespace:
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      run: blog
+  template:
+    metadata:
+      labels:
+        run: blog
+    spec:
+      containers:
+      - image: bitnami/wordpress:latest
+        imagePullPolicy: Always
+        name: wordpress
+        ports:
+        - containerPort: 8080
+          protocol: TCP
+        - containerPort: 8443
+          protocol: TCP
+        livenessProbe:
+          httpGet:
+            path: /
+            port: 8080
+            scheme: HTTP
+          initialDelaySeconds: 60
+          timeoutSeconds: 20
+          periodSeconds: 10
+          failureThreshold: 3
+        readinessProbe:
+          httpGet:
+            path: /
+            port: 8080
+            scheme: HTTP
+          initialDelaySeconds: 60
+          timeoutSeconds: 20
+          periodSeconds: 10
+          failureThreshold: 3
+        env:
+        - name: MARIADB_HOST
+          value: mariadb
+        - name: MARIADB_PORT_NUMBER
+          value: '3306'
+        - name: WORDPRESS_DATABASE_NAME
+          value: wordpress
+        - name: WORDPRESS_DATABASE_USER
+          value: bitnami
+        - name: WORDPRESS_DATABASE_PASSWORD
+          value: bitnami123
+        - name: WORDPRESS_USERNAME
+          value: admin
+        - name: WORDPRESS_PASSWORD
+          value: password
+        - name: WORDPRESS_BLOG_NAME
+          value: Adriano's Blog
+      terminationGracePeriodSeconds: 10
+      dnsPolicy: ClusterFirst
+      restartPolicy: Always

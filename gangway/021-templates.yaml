@@ -1,0 +1,122 @@
+apiVersion: v1
+data:
+  commandline.tmpl: "<!DOCTYPE html>\n<html lang=\"en\">\n<head>\n  <meta http-equiv=\"Content-Type\"
+    content=\"text/html; charset=UTF-8\"/>\n  <meta name=\"viewport\" content=\"width=device-width,
+    initial-scale=1, maximum-scale=1.0\"/>\n  <title>Clastix Login</title>\n\n  <!--
+    CSS  -->\n  <link href=\"https://fonts.googleapis.com/icon?family=Material+Icons\"
+    rel=\"stylesheet\">\n  <link rel=\"stylesheet\" href=\"https://cdnjs.cloudflare.com/ajax/libs/materialize/0.100.2/css/materialize.min.css\">\n\n
+    \ <!-- Prism -->\n  <script src=\"https://cdnjs.cloudflare.com/ajax/libs/prism/1.14.0/prism.min.js\"
+    integrity=\"sha256-jTGzLAqOAcOL+ALD2f2tvFY7fs6dwkOeo88xiuVHaRk=\" crossorigin=\"anonymous\"></script>\n
+    \ <script src=\"https://cdnjs.cloudflare.com/ajax/libs/prism/1.14.0/components/prism-bash.min.js\"
+    integrity=\"sha256-Ch5rv5tgAdVMCh7Wqb0UOcXkQAHNFSezi+0v/0z6xfw=\" crossorigin=\"anonymous\"></script>\n
+    \ <link rel=\"stylesheet\" href=\"https://cdnjs.cloudflare.com/ajax/libs/prism/1.14.0/themes/prism-tomorrow.min.css\"
+    integrity=\"sha256-4S9ufRr1EqaUFFeM9/52GH68Hs1Sbvx8eFXBWpl8zPI=\" crossorigin=\"anonymous\"
+    />\n  <link rel=\"stylesheet\" href=\"https://cdnjs.cloudflare.com/ajax/libs/prism/1.14.0/plugins/toolbar/prism-toolbar.min.css\"
+    integrity=\"sha256-xY7/SUa769r0PZ1ytZPFj2WqnOZYaYSKbX1hVTiQlcA=\" crossorigin=\"anonymous\"
+    />\n  <script src=\"https://cdnjs.cloudflare.com/ajax/libs/prism/1.14.0/plugins/toolbar/prism-toolbar.min.js\"
+    integrity=\"sha256-OvKYJLcYRP3ZIPilT03rynyZfkdGFwzCwU82NB4/AT4=\" crossorigin=\"anonymous\"></script>
+    \ \n  <script src=\"https://cdnjs.cloudflare.com/ajax/libs/clipboard.js/2.0.0/clipboard.min.js\"></script>\n
+    \ <script src=\"https://cdnjs.cloudflare.com/ajax/libs/prism/1.14.0/plugins/copy-to-clipboard/prism-copy-to-clipboard.min.js\"
+    integrity=\"sha256-s+Z1sBUQFaaw7xeAnWb/oS8gBM4MEKiEWMRJ0p+/xbc=\" crossorigin=\"anonymous\"></script>\n</head>\n
+    \   <body>\n        <nav class=\"light-blue blue\" role=\"navigation\">\n            <div
+    class=\"nav-wrapper container\"><a id=\"logo-container\" href=\"https://clastix.io\" class=\"brand-logo\">Clastix</a>\n
+    \           <ul class=\"right hide-on-med-and-down\">\n                <li><a
+    href=\"/logout\">Logout</a></li>\n            </ul>\n\n            <ul id=\"nav-mobile\"
+    class=\"side-nav\">\n                <li><a href=\"#\">Decode JWT</a></li>\n            </ul>\n
+    \           <a href=\"#\" data-activates=\"nav-mobile\" class=\"button-collapse\"><i
+    class=\"material-icons\">menu</i></a>\n            </div>\n        </nav>\n        <div
+    class=\"container\">\n            <h4 class=\"header center darken-3\">\n                Welcome
+    {{ .Username }}.\n            </h4>\n            <h5>\n                In order
+    to get command-line access to the {{ .ClusterName }} Kubernetes cluster, you will
+    need to configure OpenID Connect (OIDC) authentication for your client.\n            </h5>\n
+    \           <br>\n            <p>\n                The Kubernetes command-line
+    utility, kubectl, may be installed like so:\n            </p>\n           <pre>\n
+    \            <code class=\"language-bash\">\n$ curl -LO https://storage.googleapis.com/kubernetes-release/release/`curl
+    -s https://storage.googleapis.com/kubernetes-release/release/stable.txt`/bin/$(uname
+    | awk '{print tolower($0)}')/amd64/kubectl\n$ chmod +x ./kubectl\n$ sudo mv ./kubectl
+    /usr/local/bin/kubectl\n             </code>\n           </pre>\n            <div
+    class=\"row\">\n                <div class=\"col s12 right-align\"><a href=\"{{
+    .HTTPPath }}/kubeconf\" class=\"btn-large waves-effect waves-light blue\">Download
+    Kubeconfig</a></div>\n                <div class=\"col s12\">Once kubectl is installed,
+    you may execute the following:</div>\n            </div>\n            <pre>\n
+    \              <code class=\"language-bash\">\necho \"{{ .ClusterCA }}\" \\ >
+    ca-{{ .ClusterName }}.pem\nkubectl config set-cluster {{ .ClusterName }} --server={{
+    .APIServerURL }} --certificate-authority=ca-{{ .ClusterName }}.pem --embed-certs\nkubectl
+    config set-credentials {{ .KubeCfgUser }}  \\\n    --auth-provider=oidc  \\\n
+    \   --auth-provider-arg='idp-issuer-url={{ .IssuerURL }}'  \\\n    --auth-provider-arg='client-id={{
+    .ClientID }}'  \\\n    --auth-provider-arg='client-secret={{ .ClientSecret }}'
+    \\\n    --auth-provider-arg='refresh-token={{ .RefreshToken }}' \\\n    --auth-provider-arg='id-token={{
+    .IDToken }}'\nkubectl config set-context {{ .ClusterName }} --cluster={{ .ClusterName
+    }} --user={{ .KubeCfgUser }}\nkubectl config use-context {{ .ClusterName }}\nrm
+    ca-{{ .ClusterName }}.pem\n              </code>\n            </pre>\n        </div>\n
+    \   </body>\n</html>\n"
+  home.tmpl: |
+    <!DOCTYPE html>
+    <html lang="en">
+    <head>
+      <meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>
+      <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1.0"/>
+      <title>Clastix Login</title>
+
+      <!-- CSS  -->
+      <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+      <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/materialize/0.100.2/css/materialize.min.css">
+      <style>
+        pre.bash {
+            background-color: black;
+            color: #49fb35;
+            font-size: small;
+            font-family: Consolas,Monaco,Lucida Console,Liberation Mono,DejaVu Sans Mono,Bitstream Vera Sans Mono,Courier New, monospace;
+            overflow: auto;
+            word-wrap: normal;
+            white-space: pre;
+        }
+
+        .icon-block {
+        padding: 0 15px;
+        }
+        .icon-block .material-icons {
+            font-size: inherit;
+        }
+    </style>
+    </head>
+    <body>
+      <nav class="light-blue blue" role="navigation">
+        <div class="nav-wrapper container"><a id="logo-container" href="https://clastix.io" class="brand-logo">Clastix</a>
+          <ul class="right hide-on-med-and-down">
+
+          </ul>
+
+          <ul id="nav-mobile" class="side-nav">
+
+          </ul>
+          <a href="#" data-activates="nav-mobile" class="button-collapse"><i class="material-icons">menu</i></a>
+        </div>
+      </nav>
+      <div class="section no-pad-bot" id="index-banner">
+        <div class="container">
+          <br><br>
+          <h1 class="header center darken-3">Kubernetes Authentication</h1>
+          <div class="row center">
+            <h5 class="header col s12 light">This utility will help you authenticate against a Kubernetes cluster with an OpenID Connect (OIDC) flow. Sign in to get started.</h5>
+          </div>
+          <div class="row center">
+            <a href="{{ .HTTPPath }}/login" id="download-button" class="btn-large waves-effect waves-light blue">Sign In</a>
+          </div>
+          <br><br>
+
+        </div>
+      </div>
+
+
+      <!--  Scripts-->
+      <script src="https://code.jquery.com/jquery-2.1.1.min.js"></script>
+      <script src="js/materialize.js"></script>
+      <script src="js/init.js"></script>
+
+      </body>
+    </html>
+kind: ConfigMap
+metadata:
+  name: templates
+  namespace: auth

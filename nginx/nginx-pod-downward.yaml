@@ -1,0 +1,24 @@
+apiVersion: v1
+kind: Pod
+metadata:
+  name: nginx
+  namespace:
+  labels:
+  annotations:
+    readme: "before to run this pod, make sure you have a service account defined."
+spec:
+  containers:
+  - name: nginx
+    image: nginx:latest
+    ports:
+    - containerPort: 80
+    volumeMounts:
+    - name: podinfo
+      mountPath: /mnt
+  volumes:
+  - name: podinfo
+    downwardAPI:
+      items:
+      - path: "annotations"
+        fieldRef:
+          fieldPath: metadata.annotations

@@ -1,0 +1,16 @@
+apiVersion: extensions/v1beta1
+kind: Ingress
+metadata:
+  namespace: minio
+  name: minio
+  annotations:
+    kubernetes.io/ingress.class: traefik
+spec:
+  rules:
+  - host: minio.noverit.com
+    http:
+      paths:
+      - path: /
+        backend:
+          serviceName: minio
+          servicePort: 9000

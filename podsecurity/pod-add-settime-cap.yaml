@@ -1,0 +1,22 @@
+apiVersion: v1
+kind: Pod
+metadata:
+  name: pod-with-settime-cap
+  namespace:
+  labels:
+spec:
+  containers:
+  - name: busybox
+    image: busybox:latest
+    command: ["/bin/sleep", "3600"]
+    securityContext:
+      capabilities:
+        add:
+        - SYS_TIME
+    resources:
+      requests:
+        cpu: 100m
+        memory: 512Mi
+      limits:
+        cpu: 100m
+        memory: 512Mi

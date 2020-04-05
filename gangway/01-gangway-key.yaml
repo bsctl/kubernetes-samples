@@ -1,0 +1,8 @@
+apiVersion: v1
+data:
+  sessionkey: UzFNOU1uK0NmZ1BTL2VtNGNaTnhZZGdyc0xuRzJKNEp4YTNpb3pXT1B6QT0=
+kind: Secret
+metadata:
+  name: gangway-key
+  namespace: auth
+type: Opaque

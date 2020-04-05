@@ -1,0 +1,23 @@
+# To access the router(s)
+# oc get pods --namespace=openshift-ingress
+---
+apiVersion: route.openshift.io/v1
+kind: Route
+metadata:
+  annotations:
+  labels:
+    app: nodejs
+  name: nodejs
+  namespace:
+spec:
+  host: demo00.apps.noverit.osc.link
+  port:
+    targetPort: 8080
+  subdomain: ""
+  tls:
+    insecureEdgeTerminationPolicy: Redirect
+    termination: edge
+  to:
+    kind: Service
+    name: nodejs
+    weight: 100

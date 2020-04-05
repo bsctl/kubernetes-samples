@@ -1,0 +1,51 @@
+apiVersion: apps.openshift.io/v1
+kind: DeploymentConfig
+metadata:
+  labels:
+    app: nodejs
+  name: nodejs
+  namespace:
+spec:
+  replicas: 3
+  revisionHistoryLimit: 10
+  selector:
+    app: nodejs
+    deploymentconfig: nodejs
+  strategy:
+    rollingParams:
+      intervalSeconds: 1
+      maxSurge: 1
+      maxUnavailable: 0
+    type: Rolling
+  triggers:
+  - type: ConfigChange # any change to the pod template triggers a new deploy
+  template:
+    metadata:
+      labels:
+        app: nodejs
+        deploymentconfig: nodejs
+    spec:
+      containers:
+      - image: bsctl/nodejs-web-app:1.0
+        imagePullPolicy: Always
+        name: nodejs
+        ports:
+        - containerPort: 8080
+          protocol: TCP
+        livenessProbe:
+          httpGet:
+            path: /
+            port: 8080
+            scheme: HTTP
+        readinessProbe:
+          httpGet:
+            path: /
+            port: 8080
+            scheme: HTTP
+        resources:
+          requests:
+            cpu: 100m
+            memory: 512Mi
+          limits:
+            cpu: 100m
+            memory: 512Mi

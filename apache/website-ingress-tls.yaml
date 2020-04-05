@@ -1,0 +1,27 @@
+apiVersion: extensions/v1beta1
+kind: Ingress
+metadata:
+  name: website-with-tls
+  annotations:
+    kubernetes.io/ingress.class: "traefik"
+spec:
+  # Assume key and certificate are available with "/CN=web.kubernetes.noverit.com"
+  # openssl req -x509 -nodes -days 365 -newkey rsa:4096 \
+  #      -keyout web-tls.key \
+  #      -out web-tls.crt \
+  #      -subj "/CN=web.kubernetes.noverit.com"
+  #
+  # Also assume web-tls-secret already exists in the current namespace
+  # kubectl create secret tls web-tls-secret --cert=web-tls.crt --key=web-tls.key
+  tls:
+  - hosts:
+    - web.kube.noverit.com
+    secretName: web-tls-secret
+  rules:
+  - host: web.kube.noverit.com
+    http:
+      paths:
+      - path: /
+        backend:
+          serviceName: website
+          servicePort: 80

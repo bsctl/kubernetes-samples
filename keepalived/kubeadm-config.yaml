@@ -1,0 +1,24 @@
+# Usage: kubeadm init --config=kubeadm-config.yaml  --ignore-preflight-errors=NumCPU
+apiVersion: kubeadm.k8s.io/v1beta1
+kind: ClusterConfiguration
+kubernetesVersion: stable
+apiServer:
+  certSANs:
+  - "caldera"
+  - "caldera.clastix.io" # DNS name for VIP
+  - "caldera01.clastix.io" # DNS name for IP of Master 01
+  - "caldera02.clastix.io" # DNS name for IP of Master 02
+  - "caldera03.clastix.io" # DNS name for IP of Master 03
+  - "localhost"
+  - "10.10.10.250" # VIP
+  - "10.10.10.11" # IP of Master 01
+  - "10.10.10.12" # IP of Master 02
+  - "10.10.10.13" # IP of Master 03
+  - "127.0.0.1"
+controlPlaneEndpoint: "caldera.clastix.io:6443"
+networking:
+  serviceSubnet: "10.32.0.0/16"
+  podSubnet: "10.38.0.0/16"
+  # For Flannel as CNI, use podSubnet: "10.244.0.0/16"
+  dnsDomain: "cluster.local"
+

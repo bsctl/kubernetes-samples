@@ -1,0 +1,20 @@
+apiVersion: velero.io/v1
+kind: Backup
+metadata:
+  labels:
+    velero.io/storage-location: default
+  name: production
+  namespace: velero
+spec:
+  excludedNamespaces: null
+  excludedResources: null
+  hooks:
+    resources: null
+  includeClusterResources: null
+  includedNamespaces:
+  - production
+  includedResources: null
+  labelSelector: null
+  storageLocation: default
+  ttl: 720h0m0s
+  volumeSnapshotLocations: null

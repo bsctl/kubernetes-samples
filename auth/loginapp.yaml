@@ -1,0 +1,80 @@
+apiVersion: extensions/v1beta1
+kind: Deployment
+metadata:
+  name: loginapp
+  namespace: auth
+spec:
+  replicas: 1
+  template:
+    metadata:
+      labels:
+        app: loginapp
+    spec:
+      containers:
+      - name: loginapp
+        image: objectiflibre/login-app:latest
+        ports:
+        - name: http
+          containerPort: 5555
+        volumeMounts:
+        - name: ca
+          mountPath: /etc/ssl/
+        - name: config
+          mountPath: /app/
+        - name: tls
+          mountPath: /etc/loginapp/tls
+        resources:
+      volumes:
+      - name: ca
+        configMap:
+          name: ca
+          items:
+          - key: ca.pem
+            path: ca.pem
+      - name: config
+        configMap:
+          name: loginapp
+          items:
+          - key: config.yaml
+            path: config.yaml
+      - name: tls
+        secret:
+          secretName: login-local-clastix-io-tls
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: loginapp
+  namespace: auth
+spec:
+  type: NodePort
+  ports:
+  - name: loginapp
+    port: 5555
+    protocol: TCP
+    targetPort: 5555
+    nodePort: 32002
+  selector:
+    app: loginapp
+
+---
+kind: ConfigMap
+apiVersion: v1
+metadata:
+  name: loginapp
+  namespace: auth
+data:
+  config.yaml: |
+    debug: false
+    client_id: "loginapp"
+    client_secret: 4TORGiNV9M54BTk1v7dNuFSaI6hUjfjr
+    issuer_url: "https://dex.local.clastix.io:32000/dex"
+    issuer_root_ca: "/etc/ssl/ca.pem"
+    redirect_url: "https://login.local.clastix.io:32002/callback"
+    listen: "https://0.0.0.0:5555"
+    tls_cert: "/etc/loginapp/tls/tls.crt"
+    tls_key: "/etc/loginapp/tls/tls.key"
+    disable_choices: false
+    extra_scopes: "groups"
+    app_name: "Kubernetes Auth"

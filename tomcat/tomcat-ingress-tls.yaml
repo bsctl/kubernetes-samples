@@ -1,0 +1,20 @@
+apiVersion: extensions/v1beta1
+kind: Ingress
+metadata:
+  namespace:
+  name: taas
+  annotations:
+    kubernetes.io/ingress.class: "traefik"
+spec:
+  tls:
+  - hosts:
+    - taas.kube.noverit.com
+    secretName: tomcat-tls-secret
+  rules:
+  - host: tomcat.kube.noverit.com
+    http:
+      paths:
+      - path: /
+        backend:
+          serviceName: taas
+          servicePort: 8000

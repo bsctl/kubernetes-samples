@@ -1,0 +1,30 @@
+apiVersion: v1
+kind: Pod
+metadata:
+  name: nginx-sidecar
+  namespace:
+  labels:
+    run: nginx
+spec:
+  containers:
+  - name: main
+    image: nginx:latest
+    ports:
+    - containerPort: 80
+    volumeMounts:
+    - name: html
+      mountPath: /usr/share/nginx/html
+  - name: supporting
+    image: busybox:latest
+    volumeMounts:
+    - name: html
+      mountPath: /mnt
+    command: ["/bin/sh", "-c"]
+    args:
+      - while true; do
+          date >> /mnt/index.html;
+          sleep 10;
+        done
+  volumes:
+  - name: html
+    emptyDir: {}

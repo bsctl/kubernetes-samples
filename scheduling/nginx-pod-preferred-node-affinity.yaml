@@ -1,0 +1,30 @@
+apiVersion: v1
+kind: Pod
+metadata:
+  name: nginx-preferred-node-affinity
+  namespace:
+  labels:
+    app: nginx
+spec:
+  affinity:
+    nodeAffinity:
+      preferredDuringSchedulingIgnoredDuringExecution:
+      - weight: 1
+        preference:
+          matchExpressions:
+          - key: hypervisor
+            operator: In
+            values:
+            - esxi
+      - weight: 2
+        preference:
+          matchExpressions:
+          - key: hypervisor
+            operator: In
+            values:
+            - kvm
+  containers:
+  - name: nginx
+    image: nginx:latest
+    ports:
+    - containerPort: 80
