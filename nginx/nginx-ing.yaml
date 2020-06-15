@@ -1,15 +1,16 @@
 apiVersion: extensions/v1beta1
 kind: Ingress
 metadata:
-  name: blog
+  namespace: 
+  name: nginx
   annotations:
-    kubernetes.io/ingress.class: "traefik"
+    #kubernetes.io/ingress.class:
 spec:
   rules:
-  - host: blog.demo.noverit.com
+  - host: web.demo.noverit.com
     http:
       paths:
       - path: /
         backend:
-          serviceName: wordpress
+          serviceName: nginx
           servicePort: 80

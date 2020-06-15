@@ -1,0 +1,7 @@
+apiVersion: networking.k8s.io/v1beta1
+kind: IngressClass
+metadata:
+  name: external.lb
+spec:
+  controller: example.com/ingress-controller
+  parameters:

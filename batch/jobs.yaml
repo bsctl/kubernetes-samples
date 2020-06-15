@@ -1,0 +1,45 @@
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: simplejob
+spec:
+  completions: 16
+  parallelism: 4
+  template:
+    metadata:
+      name: hello
+    spec:
+      containers:
+      - name: hello
+        image: busybox
+        imagePullPolicy: IfNotPresent
+        env:
+        - name: POD_NAME
+          valueFrom:
+            fieldRef:
+              fieldPath: metadata.name
+        args:
+        - /bin/sh
+        - -c
+        - echo Hello from $(POD_NAME)
+      restartPolicy: OnFailure
+---
+apiVersion: batch/v1beta1
+kind: CronJob
+metadata:
+  name: currentdate
+spec:
+  schedule: "*/1 * * * *"
+  jobTemplate:
+    spec:
+      template:
+        spec:
+          containers:
+          - name: date
+            image: busybox
+            imagePullPolicy: IfNotPresent
+            args:
+            - /bin/sh
+            - -c
+            - echo "Current date is"; date
+          restartPolicy: OnFailure

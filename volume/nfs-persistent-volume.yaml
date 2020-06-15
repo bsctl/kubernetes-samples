@@ -11,3 +11,31 @@ spec:
     path: "/mnt/share-00"
     server: 10.10.10.2
   persistentVolumeReclaimPolicy: Recycle
+---
+apiVersion: v1
+kind: PersistentVolume
+metadata:
+  name: share-01
+spec:
+  capacity:
+    storage: 1Gi
+  accessModes:
+  - ReadWriteMany
+  nfs:
+    path: "/mnt/share-00"
+    server: 10.10.10.2
+  persistentVolumeReclaimPolicy: Recycle
+---
+apiVersion: v1
+kind: PersistentVolume
+metadata:
+  name: share-02
+spec:
+  capacity:
+    storage: 1Gi
+  accessModes:
+  - ReadWriteMany
+  nfs:
+    path: "/mnt/share-00"
+    server: 10.10.10.2
+  persistentVolumeReclaimPolicy: Recycle

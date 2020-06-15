@@ -34,16 +34,6 @@ data:
       address = ":9090"
     
     ################################################################
-    # Enable Let's Encrypt automatic SSL
-    ################################################################
-    #[acme]
-    #email = "info@noverit.com"
-    #storage = "acme.json"
-    #entryPoint = "https" 
-    #onHostRule = true
-    #[acme.httpChallenge]
-    #entryPoint = "http"
-    ################################################################
     # Traefik logs configuration
     ################################################################
     [traefikLog]

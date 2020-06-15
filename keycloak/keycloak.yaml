@@ -2,7 +2,7 @@ apiVersion: v1
 kind: Service
 metadata:
   name: keycloak
-  namespace: cmp
+  namespace: auth-system
   labels:
     app: keycloak
 spec:
@@ -18,12 +18,12 @@ spec:
 apiVersion: extensions/v1beta1
 kind: Ingress
 metadata:
-  namespace: cmp
+  namespace: auth-system
   name: keycloak
   annotations:
 spec:
   rules:
-  - host: auth.noverit.com
+  - host: sso.noverit.com
     http:
       paths:
       - path: /
@@ -35,7 +35,7 @@ apiVersion: apps/v1
 kind: Deployment
 metadata:
   name: keycloak
-  namespace: cmp
+  namespace: auth-system
   labels:
     app: keycloak
 spec:
@@ -52,8 +52,6 @@ spec:
       - name: keycloak
         image: jboss/keycloak:8.0.2
         imagePullPolicy: Always
-        args:
-        - -Dkeycloak.profile.feature.docker=enabled
         env:
         - name: KEYCLOAK_USER
           value: admin
@@ -64,7 +62,7 @@ spec:
         - name: JGROUPS_DISCOVERY_PROTOCOL
           value: dns.DNS_PING
         - name: JGROUPS_DISCOVERY_PROPERTIES
-          value: dns_query=keycloak.cmp.svc.cluster.local
+          value: dns_query=keycloak.auth-system.svc.cluster.local
         - name: PROXY_ADDRESS_FORWARDING
           value: 'true'
         ports:

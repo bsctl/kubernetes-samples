@@ -60,6 +60,15 @@ spec:
           value: password
         - name: WORDPRESS_BLOG_NAME
           value: Adriano's Blog
+        volumeMounts:
+        - name: installation-files
+          mountPath: "/bitnami/wordpress"
+        securityContext:
+          runAsUser: 0
       terminationGracePeriodSeconds: 10
       dnsPolicy: ClusterFirst
       restartPolicy: Always
+      volumes:
+      - name: installation-files
+        persistentVolumeClaim:
+          claimName: wordpress-pvc

@@ -1,12 +1,11 @@
 kind: PersistentVolumeClaim
 apiVersion: v1
 metadata:
-  name: pvc
-  namespace:
+  name: wordpress-pvc
 spec:
   storageClassName: standard
   accessModes:
     - ReadWriteOnce
   resources:
     requests:
-      storage: 123Gi
+      storage: 100Mi

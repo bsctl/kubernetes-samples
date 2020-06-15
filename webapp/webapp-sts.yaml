@@ -1,0 +1,149 @@
+apiVersion: extensions/v1beta1
+kind: Ingress
+metadata:
+  name: webapp-0
+  namespace:
+  labels:
+  annotations:
+    kubernetes.io/ingress.class: "traefik"
+spec:
+  rules:
+  - host: webapp-0.cmp.local
+    http:
+      paths:
+      - path: /
+        backend:
+          serviceName: webapp-0
+          servicePort: 80
+---
+apiVersion: extensions/v1beta1
+kind: Ingress
+metadata:
+  name: webapp-1
+  namespace:
+  labels:
+  annotations:
+    kubernetes.io/ingress.class: "traefik"
+spec:
+  rules:
+  - host: webapp-1.cmp.local
+    http:
+      paths:
+      - path: /
+        backend:
+          serviceName: webapp-1
+          servicePort: 80
+---
+apiVersion: extensions/v1beta1
+kind: Ingress
+metadata:
+  name: webapp-2
+  namespace:
+  labels:
+  annotations:
+    kubernetes.io/ingress.class: "traefik"
+spec:
+  rules:
+  - host: webapp-2.cmp.local
+    http:
+      paths:
+      - path: /
+        backend:
+          serviceName: webapp-2
+          servicePort: 80
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: webapp-0
+spec:
+  clusterIP: None
+  ports:
+  - port: 80
+    name: http
+    targetPort: 8080
+  selector:
+    statefulset.kubernetes.io/pod-name: webapp-0
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: webapp-1
+spec:
+  clusterIP: None
+  ports:
+  - port: 80
+    name: http
+    targetPort: 8080
+  selector:
+    statefulset.kubernetes.io/pod-name: webapp-1
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: webapp-2
+spec:
+  clusterIP: None
+  ports:
+  - port: 80
+    name: http
+    targetPort: 8080
+  selector:
+    statefulset.kubernetes.io/pod-name: webapp-2
+---
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: webapp
+  namespace:
+  labels:
+    app: webapp
+spec:
+  serviceName: webapp
+  replicas: 3
+  selector:
+    matchLabels:
+      app: webapp
+  template:
+    metadata:
+      labels:
+        app: webapp
+    spec:
+      containers:
+      - name: server
+        image: bsctl/go-web-app:latest
+        ports:
+        - name: root
+          containerPort: 8080
+          protocol: TCP
+        - name: probe
+          containerPort: 8090
+          protocol: TCP
+        - name: metrics
+          containerPort: 9090
+          protocol: TCP
+        readinessProbe:
+          httpGet:
+            path: /ready
+            port: 8090
+            scheme: HTTP
+          periodSeconds: 20
+        livenessProbe:
+          httpGet:
+            path: /live
+            port: 8090
+            scheme: HTTP
+          periodSeconds: 15
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: webapp
+spec:
+  clusterIP: None
+  ports:
+  - port: 80
+    name: http
+    targetPort: 8080
+  selector:
+    app: webapp
