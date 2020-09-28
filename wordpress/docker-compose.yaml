@@ -20,8 +20,8 @@ services:
        - frontend
        - backend
      ports:
-       - "80:80"
-       - "443:443"
+       - "80:8080"
+       - "443:8443"
      restart: always
      environment:
        MARIADB_HOST: mariadb

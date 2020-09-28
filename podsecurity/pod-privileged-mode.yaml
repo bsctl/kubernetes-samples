@@ -5,6 +5,7 @@ metadata:
   namespace:
   labels:
 spec:
+  restartPolicy:
   containers:
   - name: busybox
     image: busybox:latest

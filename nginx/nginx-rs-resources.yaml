@@ -1,0 +1,30 @@
+apiVersion: apps/v1
+kind: ReplicaSet
+metadata:
+  labels:
+  namespace:
+  name: nginx
+spec:
+  replicas: 3
+  selector:
+    matchLabels:
+      run: nginx
+  template:
+    metadata:
+      labels:
+        run: nginx
+    spec:
+      containers:
+      - image: nginx:latest
+        name: nginx
+        resources:
+          limits:
+            memory: 4Gi
+        ports:
+        - containerPort: 80
+          protocol: TCP
+        readinessProbe:
+          httpGet:
+            path: /
+            port: 80
+            scheme: HTTP

@@ -24,6 +24,7 @@ spec:
       #  effect: NoSchedule
       containers:
       - image: traefik:1.7.11-alpine
+        imagePullPolicy: 
         name: traefik
         resources:
           requests:
