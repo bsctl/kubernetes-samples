@@ -13,7 +13,7 @@ spec:
       port: 9090
       name: metrics
     - protocol: TCP
-      port: 8080
+      port: 8081
       name: dashboard
 ---
 apiVersion: extensions/v1beta1
@@ -25,10 +25,10 @@ metadata:
     kubernetes.io/ingress.class: "traefik"
 spec:
   rules:
-  - host: traefik.demo.noverit.com
+  - host: traefik.noverit.com
     http:
       paths:
       - path: /
         backend:
           serviceName: traefik
-          servicePort: 8080
+          servicePort: 8081

@@ -39,9 +39,9 @@ spec:
         - name: config
           mountPath: /opt/config
           readOnly: true
-        - name: certs
-          mountPath: /opt/certs
-          readOnly: true
+        #- name: certs
+        #  mountPath: /opt/certs
+        #  readOnly: true
         securityContext:
           capabilities:
             drop:
@@ -55,6 +55,6 @@ spec:
       - name: config
         configMap:
           name: traefik-config
-      - name: certs
-        secret:
-          secretName: noverit-tls
+      #- name: certs
+      #  secret:
+      #    secretName: noverit-tls

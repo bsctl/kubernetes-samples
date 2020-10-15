@@ -10,3 +10,4 @@ spec:
     targetPort: 3306
   selector:
     run: mariadb
+  type: ClusterIP

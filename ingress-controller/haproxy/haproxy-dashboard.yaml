@@ -11,22 +11,5 @@ spec:
   ports:
     - protocol: TCP
       port: 80
-      name: dashboard
       targetPort: 1024
----
-apiVersion: extensions/v1beta1
-kind: Ingress
-metadata:
-  name: haproxy-dashboard
-  namespace: kube-system
-  annotations:
-    kubernetes.io/ingress.class: "haproxy"
-spec:
-  rules:
-  - host: haproxy.noverit.com
-    http:
-      paths:
-      - path: /
-        backend:
-          serviceName: haproxy-dashboard
-          servicePort: 80
+  type: NodePort

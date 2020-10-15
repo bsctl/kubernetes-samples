@@ -4,4 +4,3 @@ metadata:
   name: haproxy-configmap
   namespace: kube-system
 data:
-  check: "enabled"

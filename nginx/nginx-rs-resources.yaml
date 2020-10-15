@@ -19,7 +19,11 @@ spec:
         name: nginx
         resources:
           limits:
-            memory: 4Gi
+            cpu: 500m
+            memory: 8Gi
+          requests:
+            cpu: 100m
+            memory: 5Gi
         ports:
         - containerPort: 80
           protocol: TCP

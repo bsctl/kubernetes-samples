@@ -22,13 +22,13 @@ data:
 
       [entryPoints.https]
       address = ":443"
-        [entryPoints.https.tls]
-        [entryPoints.https.tls.defaultCertificate]
-          certFile = "/opt/certs/tls.crt"
-          keyFile = "/opt/certs/tls.key"
+        #[entryPoints.https.tls]
+        #[entryPoints.https.tls.defaultCertificate]
+          #certFile = "/opt/certs/tls.crt"
+          #keyFile = "/opt/certs/tls.key"
 
       [entryPoints.api]
-      address = ":8080"
+      address = ":8081"
 
       [entryPoints.metrics]
       address = ":9090"
