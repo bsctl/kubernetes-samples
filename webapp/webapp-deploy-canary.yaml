@@ -58,7 +58,7 @@ spec:
         version: v1.0.0
     spec:
       containers:
-      - image: bsctl/deploy-webapp:latest
+      - image: bsctl/go-web-app:latest
         name: webapp
         env:
         - name: VERSION

@@ -30,7 +30,7 @@ spec:
             path: /
             port: 8080
             scheme: HTTP
-          initialDelaySeconds: 60
+          initialDelaySeconds: 120
           timeoutSeconds: 20
           periodSeconds: 10
           failureThreshold: 3
@@ -60,15 +60,15 @@ spec:
           value: password
         - name: WORDPRESS_BLOG_NAME
           value: Adriano's Blog
-        #volumeMounts:
-        #- name: installation-files
-        #  mountPath: "/bitnami/wordpress"
+        volumeMounts:
+        - name: installation-files
+          mountPath: "/bitnami/wordpress"
         securityContext:
           runAsUser: 0
       terminationGracePeriodSeconds: 10
       dnsPolicy: ClusterFirst
       restartPolicy: Always
-      #volumes:
-      #- name: installation-files
-      #  persistentVolumeClaim:
-      #    claimName: wordpress-pvc
+      volumes:
+      - name: installation-files
+        persistentVolumeClaim:
+          claimName: wordpress-pvc

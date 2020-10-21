@@ -16,6 +16,13 @@ spec:
     - name: mysql
       protocol: TCP
       containerPort: 3306
+    livenessProbe:
+      tcpSocket:
+        port: 3306
+      initialDelaySeconds: 10
+      timeoutSeconds: 10
+      periodSeconds: 5
+      failureThreshold: 1
     readinessProbe:
       exec:
         # Check we can execute queries over TCP

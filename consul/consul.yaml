@@ -68,9 +68,9 @@ spec:
     - metadata:
         name: data
       spec:
-        storageClassName: csi-rbd-sc
+        storageClassName: standard
         accessModes:
           - ReadWriteOnce
         resources:
           requests:
-            storage: 10Gi
+            storage: 2Gi

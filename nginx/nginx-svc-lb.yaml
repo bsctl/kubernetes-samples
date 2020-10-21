@@ -7,7 +7,8 @@ metadata:
 spec:
   ports:
   - protocol: TCP
-    port: 8080
+    # this is the service port!!!
+    port: 80 # by convention, the service port is also used by the load-balancer as its public port
     targetPort: 80
   selector:
     run: nginx

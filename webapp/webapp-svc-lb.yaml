@@ -13,5 +13,5 @@ spec:
   selector:
     run: webapp
   type: LoadBalancer
-  externalTrafficPolicy: Cluster # Local
-  sessionAffinity: None # ClientIP
+  #externalTrafficPolicy: Cluster # Local
+  #sessionAffinity: None # ClientIP

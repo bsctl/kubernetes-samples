@@ -7,11 +7,10 @@ metadata:
 spec:
   ports:
   - protocol: TCP
-    port: 80
-    targetPort: 80
+    port: 1234 # this is the port used by the service to receive the requests
+    targetPort: 80 # this is the port where the pods are listening
   selector:
     run: nginx
     # multiple label selectors are permitted
     # app: web
-  type: ClusterIP
-  sessionAffinity: None
+  type: ClusterIP # this means it is for internal clients only

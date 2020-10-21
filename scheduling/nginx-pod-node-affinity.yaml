@@ -11,10 +11,10 @@ spec:
       requiredDuringSchedulingIgnoredDuringExecution:
         nodeSelectorTerms:
         - matchExpressions:
-          - key: datacenter
+          - key: gpu
             operator: In
             values:
-            - milano
+            - 'true'
   containers:
   - name: nginx
     image: nginx:latest
