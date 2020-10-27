@@ -35,7 +35,7 @@ spec:
         name: webapp
         env:
         - name: VERSION
-          value: v2.0.0
+          value: v2.0.1
         ports:
         - name: root
           containerPort: 8080
