@@ -1,0 +1,17 @@
+apiVersion: extensions/v1beta1
+kind: Ingress
+metadata:
+  name: webapp
+  namespace:
+  labels:
+  annotations:
+    kubernetes.io/ingress.class: caas
+spec:
+  rules:
+  - host: guest.k8s.fastcloud.lab
+    http:
+      paths:
+      - path: /
+        backend:
+          serviceName: webapp
+          servicePort: 80

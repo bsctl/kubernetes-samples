@@ -1,0 +1,61 @@
+# kubectl set env deploy webapp VERSION=v2.0.0
+# kubectl rollout status deploy webapp
+# kubectl rollout pause deploy webapp
+# kubectl rollout resume deploy webapp
+# kubectl rollout undo deploy webapp [--to-revision=3]
+
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  labels:
+  name: webapp
+  namespace:
+spec:
+  replicas: 6
+  selector:
+    matchLabels:
+      run: webapp
+  strategy:
+    rollingUpdate:
+      maxSurge: 1
+      maxUnavailable: 0
+    type: RollingUpdate
+  progressDeadlineSeconds: 300
+  revisionHistoryLimit: 3
+  template:
+    metadata:
+      labels:
+        run: webapp
+      annotations:
+        prometheus.io/scrape: "true"
+        prometheus.io/port: "9090"
+    spec:
+      containers:
+      - image: bsctl/go-web-app:latest
+        name: webapp
+        env:
+        - name: VERSION
+          value: v1.0.0
+        ports:
+        - name: root
+          containerPort: 8080
+          protocol: TCP
+        - name: probe
+          containerPort: 8090
+          protocol: TCP
+        - name: metrics
+          containerPort: 9090
+          protocol: TCP
+        readinessProbe:
+          httpGet:
+            path: /ready
+            port: 8090
+            scheme: HTTP
+          initialDelaySeconds: 20
+          periodSeconds: 10
+        livenessProbe:
+          httpGet:
+            path: /live
+            port: 8090
+            scheme: HTTP
+          periodSeconds: 15
