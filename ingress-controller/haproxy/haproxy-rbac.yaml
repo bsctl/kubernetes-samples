@@ -27,9 +27,12 @@ rules:
   - watch
 - apiGroups:
   - "extensions"
+  - "ingresses.networking.k8s.io"
+  - "networking.k8s.io"
   resources:
   - ingresses
   - ingresses/status
+  - ingressclasses
   verbs:
   - get
   - list

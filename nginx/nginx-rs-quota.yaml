@@ -1,0 +1,9 @@
+kind: ResourceQuota
+apiVersion: v1
+metadata:
+  name: nginx-pod-quota
+  namespace: namespace00
+spec:
+  hard:
+    pods: '20'
+

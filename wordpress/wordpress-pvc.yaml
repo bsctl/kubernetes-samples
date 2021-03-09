@@ -3,7 +3,7 @@ apiVersion: v1
 metadata:
   name: wordpress-pvc
 spec:
-  storageClassName: standard
+  storageClassName: ebs-sc
   accessModes:
     - ReadWriteOnce
   resources:

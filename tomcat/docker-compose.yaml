@@ -1,0 +1,17 @@
+version: '3.3'
+services:
+   tomcat:
+     image: tomcat:7
+     networks:
+       - frontend
+     ports:
+       - "80:8080"
+     restart: always
+     volumes:
+       - tomcat-sample:/opt/tomcat/webapps
+volumes:
+    tomcat-sample:
+      external: true
+networks:
+  frontend:
+    driver: bridge

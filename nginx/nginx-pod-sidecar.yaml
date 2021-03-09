@@ -6,6 +6,7 @@ metadata:
   labels:
     run: nginx
 spec:
+  restartPolicy: Always
   containers:
   - name: main
     image: nginx:latest
@@ -14,6 +15,7 @@ spec:
     volumeMounts:
     - name: html
       mountPath: /usr/share/nginx/html
+      readOnly: true
   - name: supporting
     image: busybox:latest
     volumeMounts:

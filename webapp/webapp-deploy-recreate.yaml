@@ -1,4 +1,4 @@
-# kubectl set env deploy webapp VERSION=v2.0.0
+# kubectl set env deployment webapp VERSION=v2.0.0
 # kubectl rollout status deploy webapp
 # kubectl rollout pause deploy webapp
 # kubectl rollout resume deploy webapp
@@ -17,8 +17,6 @@ spec:
       run: webapp
   strategy:
     type: Recreate
-  progressDeadlineSeconds: 300
-  revisionHistoryLimit: 3
   template:
     metadata:
       labels:

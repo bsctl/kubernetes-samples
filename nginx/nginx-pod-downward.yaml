@@ -22,3 +22,4 @@ spec:
       - path: "annotations"
         fieldRef:
           fieldPath: metadata.annotations
+                     # spec.container[0].resources.limits.memory

@@ -1,0 +1,21 @@
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: wordpress
+  labels:
+    run: blog
+spec:
+  clusterIP: None
+  ports:
+  - protocol: TCP
+    name: http
+    port: 80
+    targetPort: 8080
+  - protocol: TCP
+    name: https
+    port: 443
+    targetPort: 8443
+  selector:
+    run: blog
+  type: ClusterIP
