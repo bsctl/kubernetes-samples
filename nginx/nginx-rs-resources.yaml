@@ -23,7 +23,7 @@ spec:
             memory: 8Gi
           requests:
             cpu: 100m
-            memory: 5Gi
+            memory: 500Mi
         ports:
         - containerPort: 80
           protocol: TCP

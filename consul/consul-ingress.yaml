@@ -6,7 +6,7 @@ metadata:
     kubernetes.io/ingress.class: "haproxy"
 spec:
   rules:
-  - host: consul00.demo.noverit.com
+  - host: consul.kube.noverit.com
     http:
       paths:
       - path: /

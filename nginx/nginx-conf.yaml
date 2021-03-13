@@ -7,7 +7,7 @@ data:
   nginx.conf: |
     server {
         listen       80;
-        server_name  google.com;
+        server_name  noverit.com;
         location / {
             root   /usr/share/nginx/html;
             index  index.html index.htm;

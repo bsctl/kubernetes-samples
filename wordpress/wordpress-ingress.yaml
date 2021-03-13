@@ -1,15 +1,15 @@
 apiVersion: networking.k8s.io/v1beta1
 kind: Ingress
 metadata:
-  name: blog
+  name: wordpress
   annotations:
     kubernetes.io/ingress.class: "haproxy"
 spec:
   rules:
-  - host: wordpress.kube.noverit.com
+  - host: blog.kube.noverit.com 
     http:
       paths:
       - path: /
         backend:
-          serviceName: wordpress
+          serviceName: wordpress 
           servicePort: 80

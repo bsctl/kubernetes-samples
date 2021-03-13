@@ -7,8 +7,8 @@ metadata:
 spec:
   ports:
   - protocol: TCP
-    port: 1234 # this is the port used by the service to receive the requests
-    targetPort: 80 # this is the port where the pods are listening
+    port: 9090 # this is the port used by the service to receive the requests
+    targetPort: 80 # this is the port where the containers are listening
   selector:
     run: nginx
     # multiple label selectors are permitted

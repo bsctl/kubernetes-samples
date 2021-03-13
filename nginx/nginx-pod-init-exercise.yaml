@@ -1,0 +1,40 @@
+apiVersion: v1
+kind: Pod
+metadata:
+  name: nginx
+  namespace:
+  labels:
+    run: nginx
+spec:
+#  initContainers:
+#  - name: git-clone
+#    image: alpine/git
+#    args: ["clone", "--", "https://github.com/bsctl/jellyfish.git", "/repo"]
+#    volumeMounts:
+#      - name: content-data
+#        mountPath: /repo
+  containers:
+  - name: nginx
+    image: docker.io/bitnami/nginx:1.19-debian-10
+    ports:
+    - containerPort: 80
+    volumeMounts:
+    - name: content-data
+      mountPath: /app
+  volumes:
+  - name: content-data
+    persistentVolumeClaim:
+      claimName: pvc
+---
+kind: PersistentVolumeClaim
+apiVersion: v1
+metadata:
+  name: pvc
+  namespace:
+spec:
+  storageClassName: standard
+  accessModes:
+    - ReadWriteOnce
+  resources:
+    requests:
+      storage: 15Gi

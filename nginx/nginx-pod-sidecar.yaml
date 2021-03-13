@@ -5,8 +5,8 @@ metadata:
   namespace:
   labels:
     run: nginx
+    app: webserver
 spec:
-  restartPolicy: Always
   containers:
   - name: main
     image: nginx:latest
@@ -26,6 +26,7 @@ spec:
       - while true; do
           date >> /mnt/index.html;
           sleep 10;
+          echo "written data on the volume";
         done
   volumes:
   - name: html

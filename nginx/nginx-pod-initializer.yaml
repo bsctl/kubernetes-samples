@@ -1,0 +1,44 @@
+# Dockerfile
+# FROM alpine:latest
+# RUN  apk add --no-cache git
+# RUN  mkdir /opt/data
+# RUN  chown 1001: /opt/data
+# USER 1001
+# docker build -t bsctl/git:latest .
+---
+apiVersion: v1
+kind: Pod
+metadata:
+  name: nginx
+  labels:
+    run: nginx
+spec:
+  securityContext:
+    fsGroup: 1001
+  initContainers:
+  - name: initializer
+    image: bsctl/git:latest
+    imagePullPolicy: IfNotPresent
+    volumeMounts:
+    - name: data
+      mountPath: /opt/data
+      readOnly: false
+    command:
+    - "git"
+    - "clone"
+    - "https://github.com/bsctl/jellyfish"
+    - "/opt/data"
+  containers:
+  - name: server
+    image: bitnami/nginx:latest
+    imagePullPolicy: IfNotPresent
+    ports:
+    - containerPort: 8080
+    resources:
+    volumeMounts:
+    - name: data
+      mountPath: /app
+      readOnly: true
+  volumes:
+  - name: data
+    emptyDir:

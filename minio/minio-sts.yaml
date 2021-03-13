@@ -19,6 +19,9 @@ metadata:
 spec:
   serviceName: minio
   replicas: 4
+  selector:
+    matchLabels:
+      app: minio
   template:
     metadata:
       labels:
@@ -41,10 +44,10 @@ spec:
         - http://minio-{0...3}.minio.$(POD_NAMESPACE).svc.cluster.local/data
         ports:
         - containerPort: 9000
-        lifecycle:
-          postStart:
-            exec:
-              command: ["/bin/sh", "-c", "mkdir -p /data/default"]
+        #lifecycle:
+        #  postStart:
+        #    exec:
+        #      command: ["/bin/sh", "-c", "mkdir -p /data/default"]
         volumeMounts:
         - name: data
           mountPath: /data
@@ -52,6 +55,7 @@ spec:
   - metadata:
       name: data
     spec:
+      storageClassName: standard
       accessModes:
         - ReadWriteOnce
       resources:

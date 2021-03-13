@@ -54,14 +54,12 @@ spec:
           value: bitnami
         - name: WORDPRESS_DATABASE_PASSWORD
           value: bitnami123
-        - name: WORDPRESS_USERNAME
+        - name: WORDPRESS_USERNAME # login page /wp-login.php
           value: admin
         - name: WORDPRESS_PASSWORD
           value: password
         - name: WORDPRESS_BLOG_NAME
           value: Adriano's Blog
-        securityContext:
-          runAsUser: 0
       terminationGracePeriodSeconds: 10
       dnsPolicy: ClusterFirst
       restartPolicy: Always

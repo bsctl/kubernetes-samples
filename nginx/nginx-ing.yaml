@@ -4,13 +4,13 @@ metadata:
   namespace: 
   name: nginx
   annotations:
-    #kubernetes.io/ingress.class:
+    kubernetes.io/ingress.class: "haproxy"
 spec:
   rules:
-  - host: web.demo.noverit.com
+  - host: jellyfish.kube.noverit.com
     http:
       paths:
       - path: /
         backend:
           serviceName: nginx
-          servicePort: 80
+          servicePort: 9090
