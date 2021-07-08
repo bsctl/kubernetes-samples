@@ -1,0 +1,58 @@
+apiVersion: apps/v1
+kind: ReplicaSet
+metadata:
+  labels: {}
+  namespace:
+  name: mandelbrot
+spec:
+  replicas: 3
+  selector:
+    matchLabels:
+      run: mandelbrot
+  template:
+    metadata:
+      labels:
+        run: mandelbrot
+    spec:
+      shareProcessNamespace: true
+      containers:
+      - name: main
+        image: nginx:latest
+        ports:
+        - containerPort: 80
+        volumeMounts:
+        - name: html
+          mountPath: /usr/share/nginx/html
+          readOnly: true
+      - name: supporting
+        image: emedves/mandelbrot2png:v5
+        volumeMounts:
+        - name: html
+          mountPath: /output
+      - name: topz
+        image: bsctl/topz:v1.0.0
+        ports:
+          - containerPort: 1080
+      volumes:
+      - name: html
+        emptyDir: {}
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: mandelbrot
+  labels:
+    run: mandelbrot
+spec:
+  ports:
+  - protocol: TCP
+    name: topz
+    port: 8080
+    targetPort: 1080
+  - protocol: TCP
+    name: http
+    port: 80 
+    targetPort: 80
+  selector:
+    run: mandelbrot
+  type: LoadBalancer

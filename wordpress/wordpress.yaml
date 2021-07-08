@@ -1,0 +1,162 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  generation: 1
+  labels:
+    run: mariadb
+  name: mariadb
+  namespace:
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      run: mariadb
+  strategy:
+    rollingUpdate:
+      maxSurge: 1
+      maxUnavailable: 1
+    type: RollingUpdate
+  template:
+    metadata:
+      labels:
+        run: mariadb
+    spec:
+      restartPolicy: Always
+      #priorityClassName: system-node-critical
+      securityContext:
+        fsGroup: 0
+      containers:
+      - image: bitnami/mariadb:latest
+        imagePullPolicy: Always
+        name: mariadb
+        ports:
+        - containerPort: 3306
+          protocol: TCP
+        env:
+        - name: MARIADB_ROOT_PASSWORD
+          value: bitnami123
+        - name: MARIADB_DATABASE
+          value: wordpress
+        - name: MARIADB_USER
+          value: bitnami
+        - name: MARIADB_PASSWORD
+          value: bitnami123
+        volumeMounts:
+        - name: data
+          mountPath: /bitnami/mariadb
+      volumes:
+      - name: data
+        persistentVolumeClaim:
+          claimName: mariadb-pvc
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: mariadb
+  labels:
+spec:
+  ports:
+  - protocol: TCP
+    port: 3306
+    targetPort: 3306
+  selector:
+    run: mariadb
+  type: ClusterIP
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  generation: 1
+  labels:
+    run: blog
+  name: wordpress
+  namespace:
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      run: blog
+  template:
+    metadata:
+      labels:
+        run: blog
+    spec:
+      containers:
+      - image: bitnami/wordpress:latest
+        imagePullPolicy: Always
+        name: wordpress
+        ports:
+        - containerPort: 8080
+          protocol: TCP
+        - containerPort: 8443
+          protocol: TCP
+        livenessProbe:
+          httpGet:
+            path: /
+            port: 8080
+            scheme: HTTP
+          initialDelaySeconds: 120
+          timeoutSeconds: 20
+          periodSeconds: 10
+          failureThreshold: 3
+        readinessProbe:
+          httpGet:
+            path: /
+            port: 8080
+            scheme: HTTP
+          initialDelaySeconds: 60
+          timeoutSeconds: 20
+          periodSeconds: 10
+          failureThreshold: 3
+        env:
+        - name: MARIADB_HOST
+          value: mariadb
+        - name: MARIADB_PORT_NUMBER
+          value: '3306'
+        - name: WORDPRESS_DATABASE_NAME
+          value: wordpress
+        - name: WORDPRESS_DATABASE_USER
+          value: bitnami
+        - name: WORDPRESS_DATABASE_PASSWORD
+          value: bitnami123
+        - name: WORDPRESS_USERNAME # login page /wp-login.php
+          value: admin
+        - name: WORDPRESS_PASSWORD
+          value: password
+        - name: WORDPRESS_BLOG_NAME
+          value: Adriano's Blog
+      terminationGracePeriodSeconds: 10
+      dnsPolicy: ClusterFirst
+      restartPolicy: Always
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: wordpress
+  labels:
+    run: blog
+spec:
+  ports:
+  - protocol: TCP
+    name: http
+    port: 80
+    targetPort: 8080
+  - protocol: TCP
+    name: https
+    port: 443
+    targetPort: 8443
+  selector:
+    run: blog
+  type: LoadBalancer
+---
+kind: PersistentVolumeClaim
+apiVersion: v1
+metadata:
+  name: mariadb-pvc
+spec:
+  #storageClassName: ebs-sc
+  accessModes:
+  - ReadWriteOnce
+  resources:
+    requests:
+      storage: 12Gi

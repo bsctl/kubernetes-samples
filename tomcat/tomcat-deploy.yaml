@@ -1,4 +1,4 @@
-apiVersion: apps/v1beta2
+apiVersion: apps/v1
 kind: Deployment
 metadata:
   annotations:
@@ -33,23 +33,13 @@ spec:
             path: /
             port: 8080
             scheme: HTTP
-          initialDelaySeconds: 120
-          timeoutSeconds: 30
-          periodSeconds: 20
-          successThreshold: 1
-          failureThreshold: 3
+          initialDelaySeconds: 60
         livenessProbe:
           httpGet:
             path: /
             port: 8080
             scheme: HTTP
-          #exec:
-          #  command: ["ls", "/opt/tomcat/conf/web.xml"]
           initialDelaySeconds: 60
-          timeoutSeconds: 30
-          periodSeconds: 20
-          successThreshold: 1
-          failureThreshold: 3
         resources: {}
         terminationMessagePath: /dev/termination-log
       dnsPolicy: ClusterFirst

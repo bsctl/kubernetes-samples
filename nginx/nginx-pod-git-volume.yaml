@@ -3,15 +3,15 @@
 apiVersion: v1
 kind: Pod
 metadata:
-  name: kubeo
+  name: jellyfish
   namespace:
   labels:
-    run: kubeo
+    run: jellyfish
 spec:
   initContainers:
     - name: git-clone
       image: alpine/git
-      args: ["clone", "--", "https://github.com/bsctl/kubeo-website.git", "/repo"]
+      args: ["clone", "--", "https://github.com/bsctl/jellyfish.git", "/repo"]
       volumeMounts:
         - name: content-data
           mountPath: /repo
@@ -24,3 +24,17 @@ spec:
   volumes:
     - name: content-data
       emptyDir: {}
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: jellyfish
+  labels:
+spec:
+  ports:
+  - protocol: TCP
+    port: 80 
+    targetPort: 80
+  selector:
+    run: jellyfish
+  type: LoadBalancer

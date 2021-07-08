@@ -5,7 +5,7 @@ metadata:
   namespace:
   name: nginx2
 spec:
-  replicas: 3
+  replicas: 9
   selector:
     matchLabels:
       run: nginx

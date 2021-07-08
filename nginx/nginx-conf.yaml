@@ -3,13 +3,14 @@ kind: ConfigMap
 metadata:
   name: nginx
   namespace:
+  labels:
 data:
   nginx.conf: |
     server {
         listen       80;
-        server_name  noverit.com;
+        server_name facebook.com;
         location / {
             root   /usr/share/nginx/html;
-            index  index.html index.htm;
+            index  index.html index.htm home.html;
         }
     }
