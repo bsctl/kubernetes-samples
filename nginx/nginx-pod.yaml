@@ -7,8 +7,8 @@ metadata:
     key: value
 spec:
   containers:
-  - name: mandelbrot
-    image: emedves/mandelbrot2png:v4
+  - name: nginx
+    image: nginx
     imagePullPolicy: Always
     volumeMounts:
     - name: html

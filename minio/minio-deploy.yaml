@@ -20,7 +20,7 @@ spec:
         app: minio
     spec:
       containers:
-      - image: minio/minio:latest
+      - image: bsctl/minio:latest
         args:
         - server
         - /storage

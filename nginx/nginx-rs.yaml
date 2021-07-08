@@ -3,9 +3,9 @@ kind: ReplicaSet
 metadata:
   labels:
   namespace:
-  name: nginx2
+  name: nginx
 spec:
-  replicas: 9
+  replicas: 1
   selector:
     matchLabels:
       run: nginx
